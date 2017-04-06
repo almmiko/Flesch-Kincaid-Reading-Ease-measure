@@ -28,7 +28,7 @@ class Readability
 
         foreach ($result[0] as $word) {
             if ( is_string($word) ) {
-                $this->wordsArray[] = $word;
+                $this->wordsArray[] = strtolower($word);
             };
         }
     }
@@ -36,7 +36,8 @@ class Readability
     /**
      * @param $text
      */
-    private function processText($text) {
+    private function processText($text)
+    {
 
         $this->words($text);
 
@@ -99,8 +100,19 @@ class Readability
      * @param $c
      * @return bool
      */
-    private function isAVowel($c) {
+    private function isAVowel($c)
+    {
         return !! strrpos("aeiouy", $c);
+    }
+
+    /**
+     * @param $score
+     * @return int
+     */
+    private function scoreValidator($score)
+    {
+        if ($score > 100) { return 100; }
+        if ($score < 0) { return 0;}
     }
 
 
@@ -110,10 +122,13 @@ class Readability
      */
     public function ease_score($writing_sample)
        {
-
            $this->processText($writing_sample);
 
-           return 206.835 - 1.015 * ($this->numWords / $this->numSentences) - 84.6 * ($this->numSyllables / $this->numWords);
+           $score = 206.835 - 1.015 * ($this->numWords / $this->numSentences) - 84.6 * ($this->numSyllables / $this->numWords);
+
+           $scoreValidator = $this->scoreValidator($score);
+
+           return $scoreValidator ? $scoreValidator : $score;
        }
 
 
